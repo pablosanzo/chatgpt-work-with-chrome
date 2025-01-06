@@ -245,24 +245,15 @@
         }
 
         #save-api-key {
-            padding: 6px;
             background: none;
             border: none;
             cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
-            width: 32px;
-            height: 32px;
-        }
-
-        #save-api-key img {
-            width: 20px;
-            height: 20px;
-            transition: filter 0.2s ease;
-            filter: brightness(0) saturate(100%);
         }
 
         #save-api-key:hover {
@@ -273,8 +264,26 @@
             background-color: #BDDCF5 !important;
         }
 
+        #save-api-key img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) saturate(100%);
+            transition: filter 0.2s ease;
+        }
+
         #save-api-key.active img {
-            filter: invert(45%) sepia(98%) saturate(2836%) hue-rotate(194deg) brightness(103%) contrast(107%);
+            filter: invert(39%) sepia(98%) saturate(3672%) hue-rotate(201deg) brightness(105%) contrast(105%) !important;
+        }
+
+        #save-api-key svg {
+            width: 20px;
+            height: 20px;
+            fill: #000000;
+            transition: fill 0.2s ease;
+        }
+
+        #save-api-key.active svg {
+            fill: #0285FF !important;
         }
     </style>
 </head>
