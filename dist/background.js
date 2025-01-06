@@ -1,3 +1,6 @@
+// Global ports collection
+const sidePanelPorts = new Set();
+
 // Create context menu when extension is installed
 chrome.runtime.onInstalled.addListener(() => {
   // No context menus needed
@@ -6,7 +9,6 @@ chrome.runtime.onInstalled.addListener(() => {
 // Handle connections from sidepanel
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === 'sidepanel') {
-    let sidePanelPorts = new Set();
     sidePanelPorts.add(port);
     port.onDisconnect.addListener(() => {
       sidePanelPorts.delete(port);
@@ -17,7 +19,6 @@ chrome.runtime.onConnect.addListener((port) => {
 // Handle extension icon click
 chrome.action.onClicked.addListener(async (tab) => {
   // Always try to send clear message
-  let sidePanelPorts = new Set();
   sidePanelPorts.forEach(port => {
     try {
       port.postMessage({ action: 'clearConversation' });

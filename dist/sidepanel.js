@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let autoImageMode = true;  // Set to true by default
     let isShortcutMode = false;
     let lastAutoScreenshot = null; // Track auto mode screenshot separately
+    let port = null; // Store port at module level
 
     // Load API key
     const result = await chrome.storage.local.get(['openaiApiKey']);
@@ -70,9 +71,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     messageInput.placeholder = 'Message ChatGPT + image...';
 
     // Connect to the background script and handle reconnection
-    let port;
-    
     function connectToBackground() {
+        if (port) {
+            try {
+                port.disconnect();
+            } catch (e) {
+                console.error('Error disconnecting port:', e);
+            }
+        }
+        
         port = chrome.runtime.connect({ name: 'sidepanel' });
         
         port.onMessage.addListener((message) => {
@@ -82,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         port.onDisconnect.addListener(() => {
+            port = null;
             console.log('Disconnected from background, attempting to reconnect...');
             setTimeout(connectToBackground, 1000);
         });
