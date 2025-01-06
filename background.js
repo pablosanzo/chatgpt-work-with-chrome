@@ -1,25 +1,12 @@
 // Create context menu when extension is installed
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: 'openSettings',
-    title: 'Settings',
-    contexts: ['action']  // This makes it appear only in the extension icon's context menu
-  });
+  // No context menus needed
 });
-
-// Handle context menu clicks
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'openSettings') {
-    chrome.tabs.create({ url: 'settings.html' });
-  }
-});
-
-// Keep track of sidepanel ports
-let sidePanelPorts = new Set();
 
 // Handle connections from sidepanel
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === 'sidepanel') {
+    let sidePanelPorts = new Set();
     sidePanelPorts.add(port);
     port.onDisconnect.addListener(() => {
       sidePanelPorts.delete(port);
@@ -30,6 +17,7 @@ chrome.runtime.onConnect.addListener((port) => {
 // Handle extension icon click
 chrome.action.onClicked.addListener(async (tab) => {
   // Always try to send clear message
+  let sidePanelPorts = new Set();
   sidePanelPorts.forEach(port => {
     try {
       port.postMessage({ action: 'clearConversation' });
@@ -84,38 +72,30 @@ chrome.commands.onCommand.addListener(async (command) => {
 
 // Handle messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'captureTab') {
-        // Create a promise to handle the async operation
-        const capturePromise = new Promise((resolve) => {
-            chrome.tabs.captureVisibleTab(null, { format: 'jpeg', quality: 80 }, (dataUrl) => {
-                resolve({ dataUrl });
-            });
-        });
+  if (request.action === 'captureTab') {
+    chrome.tabs.captureVisibleTab(null, { format: 'jpeg', quality: 80 }, dataUrl => {
+      sendResponse({ dataUrl });
+    });
+    return true;
+  }
+  
+  if (request.action === 'screenshotTaken') {
+    // Forward the screenshot to the sidepanel
+    chrome.runtime.sendMessage({
+      action: 'addScreenshotContext',
+      dataUrl: request.dataUrl
+    });
 
-        // Send the response when the promise resolves
-        capturePromise.then(sendResponse);
-        
-        // Return true to indicate we'll send response asynchronously
-        return true;
-    }
-    
-    if (request.action === 'screenshotTaken') {
-        // Forward the screenshot to the sidepanel
-        chrome.runtime.sendMessage({
-            action: 'addScreenshotContext',
-            dataUrl: request.dataUrl
+    // Also broadcast to all tabs
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, { 
+          action: 'broadcastToSidePanel', 
+          message: { type: 'focusInput' }
+        }).catch(() => {
+          // Ignore errors from tabs that don't have a listener
         });
-
-        // Also broadcast to all tabs
-        chrome.tabs.query({}, (tabs) => {
-            tabs.forEach(tab => {
-                chrome.tabs.sendMessage(tab.id, { 
-                    action: 'broadcastToSidePanel', 
-                    message: { type: 'focusInput' }
-                }).catch(() => {
-                    // Ignore errors from tabs that don't have a listener
-                });
-            });
-        });
-    }
+      });
+    });
+  }
 });

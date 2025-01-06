@@ -66,6 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Set image button as active by default since auto mode is enabled
     imageButton.classList.add('active');
+    // Set initial placeholder text
+    messageInput.placeholder = 'Message ChatGPT + image...';
 
     // Connect to the background script and handle reconnection
     let port;
@@ -139,15 +141,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (autoImageMode) {
             // Turning off auto mode
             clearAutoMode();
-            clearShortcutMode(); // Clear any lingering shortcut state
+            imageButton.classList.remove('active');
+            messageInput.placeholder = 'Message ChatGPT...';
         } else if (isShortcutMode) {
             // Cancel shortcut mode
             clearShortcutMode();
         } else {
             // Turn on auto mode
             autoImageMode = true;
-            clearShortcutMode(); // Clear any lingering shortcut state
+            isShortcutMode = false;
             imageButton.classList.add('active');
+            messageInput.placeholder = 'Message ChatGPT (+ image)...';
         }
     });
 
