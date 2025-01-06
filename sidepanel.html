@@ -31,8 +31,9 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 0;
-            padding-bottom: 100px; /* Adjusted padding to 100px */
+            padding-bottom: 100px; 
             background-color: var(--background-primary);
+            margin-top: 52px;
         }
 
         /* Message styles */
@@ -213,9 +214,77 @@
         .image-button.active path {
             stroke: #0285FF !important;
         }
+
+        /* API Key section */
+        #api-key-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--background-primary);
+            padding: 8px 1rem;
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #api-key-input {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+        }
+
+        #api-key-input.saved {
+            -webkit-text-security: disc;
+        }
+
+        #save-api-key {
+            padding: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+            width: 32px;
+            height: 32px;
+        }
+
+        #save-api-key img {
+            width: 20px;
+            height: 20px;
+            transition: filter 0.2s ease;
+            filter: brightness(0) saturate(100%);
+        }
+
+        #save-api-key:hover {
+            background-color: #D9DADA;
+        }
+
+        #save-api-key.active {
+            background-color: #BDDCF5 !important;
+        }
+
+        #save-api-key.active img {
+            filter: invert(45%) sepia(98%) saturate(2836%) hue-rotate(194deg) brightness(103%) contrast(107%);
+        }
     </style>
 </head>
 <body>
+    <div id="api-key-section">
+        <input type="text" id="api-key-input" placeholder="OpenAI API Key">
+        <button id="save-api-key" title="Save API Key">
+            <img src="save-svgrepo-com (1).svg" width="20" height="20" />
+        </button>
+    </div>
     <div id="chat-container"></div>
 
     <div id="input-container">

@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const messageInput = document.getElementById('message-input');
     const chatContainer = document.getElementById('chat-container');
-    const apiKeyMissing = document.getElementById('api-key-missing');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const saveApiKeyButton = document.getElementById('save-api-key');
     const imageButton = document.querySelector('.image-button');
     let apiKey = null;
     let currentScreenshot = null;
@@ -13,11 +14,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     const result = await chrome.storage.local.get(['openaiApiKey']);
     apiKey = result.openaiApiKey;
     
-    if (!apiKey) {
-        apiKeyMissing.style.display = 'block';
+    if (apiKey) {
+        apiKeyInput.value = apiKey;
+        apiKeyInput.classList.add('saved');
+        saveApiKeyButton.classList.add('active');
+        messageInput.disabled = false;
+    } else {
         messageInput.disabled = true;
-        return;
     }
+
+    // Handle API key input and save
+    apiKeyInput.addEventListener('input', async () => {
+        const newValue = apiKeyInput.value.trim();
+        
+        if (apiKeyInput.classList.contains('saved')) {
+            apiKeyInput.classList.remove('saved');
+            saveApiKeyButton.classList.remove('active');
+        }
+
+        // If the input is empty, remove the API key from storage
+        if (!newValue) {
+            await chrome.storage.local.remove('openaiApiKey');
+            apiKey = null;
+        }
+
+        messageInput.disabled = !newValue;
+    });
+
+    saveApiKeyButton.addEventListener('click', async () => {
+        if (saveApiKeyButton.classList.contains('active')) {
+            // If button is active, clicking it should delete the API key
+            await chrome.storage.local.remove('openaiApiKey');
+            apiKey = null;
+            apiKeyInput.value = '';
+            apiKeyInput.classList.remove('saved');
+            saveApiKeyButton.classList.remove('active');
+            messageInput.disabled = true;
+        } else {
+            // If button is not active, save the new API key
+            const newApiKey = apiKeyInput.value.trim();
+            if (newApiKey) {
+                await chrome.storage.local.set({ openaiApiKey: newApiKey });
+                apiKey = newApiKey;
+                apiKeyInput.value = newApiKey;
+                apiKeyInput.classList.add('saved');
+                saveApiKeyButton.classList.add('active');
+                messageInput.disabled = false;
+            }
+        }
+    });
 
     // Set image button as active by default since auto mode is enabled
     imageButton.classList.add('active');
