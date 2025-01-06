@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Work With Chrome",
+  "version": "1.0",
+  "description": "ChatGPT in your browser sidepanel",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "activeTab",
+    "tabs",
+    "commands",
+    "contextMenus",
+    "windows"
+  ],
+  "action": {
+    "default_title": "Open ChatGPT Work With Chrome",
+    "default_icon": {
+      "16": "chatgpt_style/Favicon/faviconV2_bordered.png",
+      "32": "chatgpt_style/Favicon/faviconV2_bordered.png",
+      "48": "chatgpt_style/Favicon/faviconV2_bordered.png",
+      "128": "chatgpt_style/Favicon/faviconV2_bordered.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles/icon.css"]
+    }
+  ],
+  "commands": {
+    "take-screenshot": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Take a screenshot and send to ChatGPT Work With Chrome"
+    }
+  },
+  "icons": {
+    "16": "chatgpt_style/Favicon/faviconV2_bordered.png",
+    "32": "chatgpt_style/Favicon/faviconV2_bordered.png",
+    "48": "chatgpt_style/Favicon/faviconV2_bordered.png",
+    "128": "chatgpt_style/Favicon/faviconV2_bordered.png"
+  },
+  "host_permissions": [
+    "https://api.openai.com/*",
+    "<all_urls>"
+  ]
+}
